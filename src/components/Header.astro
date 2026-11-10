@@ -1,0 +1,183 @@
+---
+import { Image } from "astro:assets";
+import Icon from "./Icon.astro";
+import mark from "@/assets/brand/logo-mark.png";
+import word from "@/assets/brand/logo-word.png";
+import { nav, site } from "@/lib/site";
+---
+
+<div class="topbar">
+  <div class="container topbar__inner">
+    <p class="topbar__note"><span class="pulse" aria-hidden="true"></span> Now welcoming new clients &amp; families</p>
+    <div class="topbar__links">
+      <a href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
+      <a href={site.phone.href}><Icon name="phone" /> {site.phone.international}</a>
+    </div>
+  </div>
+</div>
+
+<header class="header" id="top" data-header>
+  <div class="container header__inner">
+    <a class="brand" href="/" aria-label={`${site.name}, home`}>
+      <Image class="brand__mark" src={mark} alt="" height={50} densities={[1, 2]} loading="eager" />
+      <Image class="brand__word" src={word} alt={site.name} height={40} densities={[1, 2]} loading="eager" />
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Main" data-nav>
+      <ul class="nav__list">
+        {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        <li class="nav__mobile-only"><a href="/#contact">Contact</a></li>
+      </ul>
+      <a class="btn btn--primary nav__mobile-only nav__mobile-call" href={site.phone.href}>
+        <Icon name="phone" /> Call {site.phone.display}
+      </a>
+    </nav>
+
+    <div class="header__actions">
+      <a class="btn btn--primary header__cta" href="/#contact"><Icon name="heart" fill /> Get Started</a>
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu" data-nav-toggle>
+        <Icon name="menu" class="ic--open" />
+        <Icon name="x" class="ic--close" />
+      </button>
+    </div>
+  </div>
+</header>
+<div class="nav-scrim" data-nav-scrim hidden></div>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  const nav = document.querySelector<HTMLElement>("[data-nav]");
+  const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+  const scrim = document.querySelector<HTMLElement>("[data-nav-scrim]");
+
+  // Elevated header once the page scrolls
+  const onScroll = () => header?.classList.toggle("is-scrolled", window.scrollY > 12);
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // Mobile drawer
+  const setOpen = (open: boolean) => {
+    nav?.classList.toggle("is-open", open);
+    toggle?.setAttribute("aria-expanded", String(open));
+    toggle?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    if (scrim) scrim.hidden = !open;
+    document.body.style.overflow = open ? "hidden" : "";
+  };
+  toggle?.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
+  scrim?.addEventListener("click", () => setOpen(false));
+  nav?.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest("a")) setOpen(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav?.classList.contains("is-open")) {
+      setOpen(false);
+      toggle?.focus();
+    }
+  });
+  window.matchMedia("(min-width: 981px)").addEventListener("change", (e) => e.matches && setOpen(false));
+
+  // Highlight the nav link for the section in view
+  const links = [...document.querySelectorAll<HTMLAnchorElement>(".nav__list a[href^='/#']")];
+  const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
+  const sections = [...byId.keys()].map((id) => document.getElementById(id)).filter((s): s is HTMLElement => !!s);
+  if (sections.length && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((a) => a.classList.remove("is-active"));
+          byId.get(entry.target.id)?.classList.add("is-active");
+        }
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    sections.forEach((s) => io.observe(s));
+  }
+</script>
+
+<style>
+  /* Top bar */
+  .topbar { background: var(--plum-900); color: rgb(255 255 255 / 0.85); font-size: 0.85rem; }
+  .topbar__inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 40px; }
+  .topbar__note { display: flex; align-items: center; gap: 10px; }
+  .topbar__links { display: flex; gap: 24px; }
+  .topbar__links a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: color 0.2s; }
+  .topbar__links a:hover { color: var(--gold-100); }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: #6ee7a8; animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgb(110 231 168 / 0.7); }
+    70%, 100% { box-shadow: 0 0 0 10px rgb(110 231 168 / 0); }
+  }
+
+  /* Header */
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgb(253 250 246 / 0.82);
+    backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent; transition: box-shadow 0.3s, border-color 0.3s, background 0.3s;
+  }
+  .header.is-scrolled { background: rgb(255 255 255 / 0.94); border-color: var(--line); box-shadow: 0 8px 30px -18px rgb(42 15 63 / 0.35); }
+  .header__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: var(--header-h); transition: min-height 0.3s; }
+  .header.is-scrolled .header__inner { min-height: 72px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+  .brand :global(.brand__mark) { height: 50px; width: auto; }
+  .brand :global(.brand__word) { height: 40px; width: auto; }
+
+  .nav__list { display: flex; gap: 4px; }
+  .nav__list a {
+    position: relative; display: block; padding: 10px 14px; border-radius: 999px;
+    text-decoration: none; font-weight: 500; font-size: 0.97rem; color: var(--ink); transition: color 0.2s, background 0.2s;
+  }
+  .nav__list a:hover { color: var(--brand); background: var(--lilac-100); }
+  .nav__list a.is-active { color: var(--brand); }
+  .nav__list a.is-active::after {
+    content: ""; position: absolute; left: 50%; bottom: 3px; width: 5px; height: 5px; margin-left: -2.5px;
+    border-radius: 50%; background: var(--gold);
+  }
+  .nav__mobile-only { display: none; }
+  .header__actions { display: flex; align-items: center; gap: 10px; }
+  .nav-toggle {
+    display: none; width: 48px; height: 48px; border-radius: 14px; border: 1px solid var(--line);
+    background: #fff; place-items: center; color: var(--plum-800); position: relative; z-index: 61;
+  }
+  .nav-toggle :global(.ic) { width: 24px; height: 24px; }
+  .nav-toggle :global(.ic--close) { display: none; }
+  .nav-toggle[aria-expanded="true"] :global(.ic--open) { display: none; }
+  .nav-toggle[aria-expanded="true"] :global(.ic--close) { display: block; }
+  .nav-scrim { position: fixed; inset: 0; background: rgb(28 10 43 / 0.45); z-index: 55; }
+
+  @media (max-width: 1100px) {
+    .nav__list a { padding: 10px; font-size: 0.93rem; }
+    .brand :global(.brand__mark) { height: 44px; }
+    .brand :global(.brand__word) { height: 34px; }
+  }
+
+  @media (max-width: 980px) {
+    /* backdrop-filter would make the header the containing block of the fixed drawer */
+    .header, .header.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgb(255 255 255 / 0.97); }
+    .topbar__links a:first-child { display: none; }
+    .nav-toggle { display: grid; }
+    .header__cta { display: none; }
+    .nav {
+      position: fixed; inset: 0 0 0 auto; width: min(360px, 88vw); z-index: 60;
+      background: #fff; padding: 100px 24px 32px; box-shadow: -30px 0 60px -20px rgb(28 10 43 / 0.35);
+      transform: translateX(100%); visibility: hidden;
+      transition: transform 0.4s var(--ease), visibility 0s linear 0.4s; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .nav.is-open { transform: none; visibility: visible; transition: transform 0.4s var(--ease); }
+    .nav__list { flex-direction: column; gap: 2px; }
+    .nav__list a { font-size: 1.15rem; padding: 14px 16px; border-radius: 14px; }
+    .nav__list a.is-active::after { left: auto; right: 16px; top: 50%; bottom: auto; margin: -2.5px 0 0; }
+    .nav__mobile-only { display: block; }
+    .nav__mobile-call { display: inline-flex; }
+  }
+
+  @media (max-width: 640px) {
+    .topbar__note { font-size: 0.8rem; }
+    .topbar__links { display: none; }
+    .header__inner { min-height: 72px; }
+    .brand :global(.brand__mark) { height: 40px; }
+    .brand :global(.brand__word) { height: 30px; }
+  }
+</style>

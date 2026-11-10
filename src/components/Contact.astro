@@ -1,0 +1,253 @@
+---
+import { getCollection } from "astro:content";
+import Icon from "./Icon.astro";
+import { site } from "@/lib/site";
+
+const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
+const relationships = ["Mother", "Father", "Spouse / Partner", "Grandparent", "Myself", "Other loved one"];
+---
+
+<section class="section contact" id="contact">
+  <div class="container contact__grid">
+    <div class="reveal">
+      <h2 class="section-title">Let's talk about the one <em>you love</em></h2>
+      <p class="lead">
+        Reach out for a free, no-obligation consultation. We'll listen, answer your questions, and help you find the right care.
+      </p>
+      <div class="cards">
+        <a class="contact-card" href={site.phone.href}>
+          <span class="contact-card__icon"><Icon name="phone" /></span>
+          <span><small>Call or text</small><strong>{site.phone.international}</strong></span>
+        </a>
+        <a class="contact-card" href={`mailto:${site.email}`}>
+          <span class="contact-card__icon"><Icon name="mail" /></span>
+          <span><small>Email us</small><strong>{site.email}</strong></span>
+        </a>
+        <div class="contact-card">
+          <span class="contact-card__icon"><Icon name="clock" /></span>
+          <span><small>We're here for you</small><strong>{site.availability}</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <form class="form reveal" action="/api/contact" method="post" novalidate data-contact-form>
+      <div data-form-body>
+        <h3 class="form__title">Request a free consultation</h3>
+        <p class="form__sub">We'll get back to you as soon as possible, usually the same day.</p>
+
+        <div class="form__row">
+          <label class="field">
+            <span>Your name <i aria-hidden="true">*</i></span>
+            <input type="text" name="name" autocomplete="name" required minlength="2" />
+          </label>
+          <label class="field">
+            <span>Phone <i aria-hidden="true">*</i></span>
+            <input type="tel" name="phone" autocomplete="tel" required minlength="7" />
+          </label>
+        </div>
+        <div class="form__row">
+          <label class="field">
+            <span>Email</span>
+            <input type="email" name="email" autocomplete="email" />
+          </label>
+          <label class="field">
+            <span>Care is for my…</span>
+            <select name="relationship">
+              <option value="">Select one</option>
+              {relationships.map((r) => <option>{r}</option>)}
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="field checks-field">
+          <legend>Services of interest</legend>
+          <div class="checks">
+            {services.map((s) => (
+              <label>
+                <input type="checkbox" name="services" value={s.data.title} />
+                <span>{s.data.title}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span>How can we help?</span>
+          <textarea name="message" rows="4" placeholder="Tell us a little about your loved one and what you're looking for."></textarea>
+        </label>
+
+        <label class="hp" aria-hidden="true">Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+
+        <button class="btn btn--primary btn--lg btn--block" type="submit" data-submit>
+          <Icon name="heart" fill /> <span data-submit-label>Send My Request</span>
+        </button>
+        <p class="form__status" role="status" aria-live="polite" data-status></p>
+        <p class="form__fine">By submitting, you agree to be contacted about care services. See our <a href="/privacy">Privacy Policy</a>.</p>
+      </div>
+
+      <div class="form__success" data-success hidden tabindex="-1">
+        <span class="form__success-icon"><Icon name="heart" fill /></span>
+        <h3 class="form__title">Thank you. We've received your request.</h3>
+        <p>A member of our care team will reach out shortly. If you need us sooner, please call
+          <a href={site.phone.href}>{site.phone.display}</a>.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  import { CARE_PLAN_EVENT } from "@/lib/events";
+  import { planToMessage } from "@/lib/careFinder";
+  import type { ContactResponse } from "@/lib/contact";
+  import { site } from "@/lib/site";
+
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+  if (form) {
+    const status = form.querySelector<HTMLElement>("[data-status]")!;
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;
+    const label = form.querySelector<HTMLElement>("[data-submit-label]")!;
+    const body = form.querySelector<HTMLElement>("[data-form-body]")!;
+    const success = form.querySelector<HTMLElement>("[data-success]")!;
+    const message = form.elements.namedItem("message") as HTMLTextAreaElement;
+    const serviceBoxes = [...form.querySelectorAll<HTMLInputElement>("input[name='services']")];
+
+    const checkService = (title: string) => {
+      const box = serviceBoxes.find((b) => b.value === title);
+      if (box) box.checked = true;
+    };
+
+    // "Ask about this" links on service cards
+    document.querySelectorAll<HTMLAnchorElement>("[data-service]").forEach((a) =>
+      a.addEventListener("click", () => checkService(a.dataset.service ?? "")),
+    );
+
+    // Care-plan builder → pre-fill
+    window.addEventListener(CARE_PLAN_EVENT, (e) => {
+      e.detail.services.forEach(checkService);
+      message.value = planToMessage(e.detail);
+      setTimeout(() => form.querySelector<HTMLInputElement>("input[name='name']")?.focus({ preventScroll: true }), 600);
+    });
+
+    const setStatus = (text: string, kind: "ok" | "err" | "" = "", html = false) => {
+      status.className = `form__status ${kind}`;
+      html ? (status.innerHTML = text) : (status.textContent = text);
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      form.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+
+      const required = [...form.querySelectorAll<HTMLInputElement>("input[required]")];
+      const invalid = required.filter((input) => !input.checkValidity());
+      const email = form.elements.namedItem("email") as HTMLInputElement;
+      if (email.value && !email.checkValidity()) invalid.push(email);
+      if (invalid.length) {
+        invalid.forEach((el) => el.classList.add("is-invalid"));
+        invalid[0]?.focus();
+        setStatus("Please add your name and a phone number so we can reach you.", "err");
+        return;
+      }
+
+      const fd = new FormData(form);
+      const payload = {
+        name: String(fd.get("name") ?? ""),
+        phone: String(fd.get("phone") ?? ""),
+        email: String(fd.get("email") ?? "").trim(),
+        relationship: String(fd.get("relationship") ?? ""),
+        services: fd.getAll("services").map(String),
+        message: String(fd.get("message") ?? ""),
+        website: String(fd.get("website") ?? ""),
+      };
+
+      submit.disabled = true;
+      label.textContent = "Sending…";
+      setStatus("");
+
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = (await res.json().catch(() => ({ ok: false }))) as ContactResponse;
+        if (!res.ok || !data.ok) throw new Error(data.error ?? "Request failed");
+
+        body.hidden = true;
+        success.hidden = false;
+        success.focus();
+      } catch (err) {
+        const reason = err instanceof Error && err.message !== "Request failed" ? `${err.message} ` : "";
+        setStatus(
+          `${reason}Please call us at <a href="${site.phone.href}">${site.phone.display}</a> or email <a href="mailto:${site.email}">${site.email}</a>.`,
+          "err",
+          true,
+        );
+      } finally {
+        submit.disabled = false;
+        label.textContent = "Send My Request";
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact { background: radial-gradient(700px 500px at 100% 0%, rgb(154 79 200 / 0.12), transparent 60%), var(--cream); }
+  .contact__grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(40px, 6vw, 80px); align-items: start; }
+  .cards { display: grid; gap: 16px; margin-top: 36px; }
+  .contact-card {
+    display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: var(--radius);
+    background: #fff; border: 1px solid var(--line); text-decoration: none; box-shadow: var(--shadow-sm);
+    transition: transform 0.25s var(--ease), border-color 0.25s;
+  }
+  a.contact-card:hover { transform: translateX(6px); border-color: var(--lilac-300); }
+  .contact-card small { display: block; font-size: 0.8rem; color: var(--muted); }
+  .contact-card strong { color: var(--plum-900); font-size: 1.06rem; overflow-wrap: anywhere; }
+  .contact-card__icon { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; background: var(--lilac-100); color: var(--brand); flex-shrink: 0; }
+  .contact-card__icon :global(.ic) { width: 22px; height: 22px; }
+
+  .form { background: #fff; border-radius: var(--radius-lg); padding: clamp(24px, 4vw, 44px); box-shadow: var(--shadow-lg); border: 1px solid var(--line); }
+  .form__title { font-family: var(--font-display); font-weight: 600; font-size: 1.7rem; color: var(--plum-900); }
+  .form__sub { color: var(--muted); margin: 6px 0 26px; font-size: 0.96rem; }
+  .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: grid; gap: 8px; margin: 0 0 18px; font-size: 0.92rem; font-weight: 600; color: var(--plum-900); min-width: 0; }
+  .field i { color: var(--gold-600); font-style: normal; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--lilac-50);
+    font-weight: 400; font-size: 1rem; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+  .field textarea { resize: vertical; min-height: 110px; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--orchid); background: #fff; box-shadow: 0 0 0 4px rgb(154 79 200 / 0.15); }
+  .field :global(.is-invalid) { border-color: var(--danger); background: #fff7f3; }
+  .checks-field { border: 0; padding: 0; }
+  .checks-field legend { margin-bottom: 10px; padding: 0; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks label { position: relative; }
+  .checks input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .checks span {
+    display: inline-block; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--lilac-50);
+    font-weight: 500; font-size: 0.88rem; cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .checks label:hover span { border-color: var(--lilac-300); }
+  .checks input:checked + span { background: var(--plum-700); border-color: var(--plum-700); color: #fff; }
+  .checks input:focus-visible + span { outline: 3px solid var(--orchid); outline-offset: 2px; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .form__status { margin-top: 14px; font-weight: 600; text-align: center; }
+  .form__status:empty { display: none; }
+  .form__status.ok { color: var(--success); }
+  .form__status.err { color: var(--danger); }
+  .form__status :global(a), .form__success a { color: var(--brand); }
+  .form__fine { margin-top: 14px; font-size: 0.8rem; color: var(--muted); text-align: center; }
+  .form__fine a { color: var(--brand); }
+  .form__success { text-align: center; padding: 32px 8px; outline: none; }
+  .form__success[hidden], [data-form-body][hidden] { display: none; }
+  .form__success p { color: var(--muted); margin-top: 12px; }
+  .form__success-icon {
+    width: 76px; height: 76px; margin: 0 auto 20px; border-radius: 50%; display: grid; place-items: center;
+    color: #fff; background: linear-gradient(135deg, var(--orchid), var(--plum-700)); animation: pop 0.6s var(--ease);
+  }
+  .form__success-icon :global(.ic) { width: 32px; height: 32px; }
+  @keyframes pop { from { transform: scale(0.4); opacity: 0; } }
+
+  @media (max-width: 980px) { .contact__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .form__row { grid-template-columns: 1fr; gap: 0; } }
+</style>

@@ -1,0 +1,43 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { site } from "@/lib/site";
+
+// TODO(client): have this reviewed before launch. Plain-language starter policy.
+const updated = "November 10, 2026";
+---
+
+<BaseLayout title={`Privacy Policy | ${site.name}`} description={`How ${site.name} collects and uses information submitted through this website.`}>
+  <Header />
+  <main id="main" class="section">
+    <article class="container prose">
+      <h1 class="section-title">Privacy Policy</h1>
+      <p class="updated">Last updated: {updated}</p>
+
+      <h2>Information we collect</h2>
+      <p>When you contact us through this website, by phone or by email, we collect the information you choose to share, such as your name, phone number, email address, and details about the care you're looking for.</p>
+
+      <h2>How we use it</h2>
+      <p>We use this information only to respond to your enquiry, arrange consultations and provide our services. We do not sell or rent your personal information.</p>
+
+      <h2>How we share it</h2>
+      <p>We share information only with service providers that help us operate this website and deliver messages (for example, our website host and email provider), or when required by law.</p>
+
+      <h2>Your choices</h2>
+      <p>You can ask us to update or delete the information you've shared at any time by contacting us at <a href={`mailto:${site.email}`}>{site.email}</a> or <a href={site.phone.href}>{site.phone.display}</a>.</p>
+
+      <h2>Contact</h2>
+      <p>{site.legalName} · <a href={`mailto:${site.email}`}>{site.email}</a> · <a href={site.phone.href}>{site.phone.international}</a></p>
+    </article>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .prose { max-width: 760px; }
+  .prose h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; color: var(--plum-900); margin: 36px 0 10px; }
+  .prose p { color: var(--muted); }
+  .prose a { color: var(--brand); }
+  .updated { margin-top: 12px; font-size: 0.9rem; }
+</style>

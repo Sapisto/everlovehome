@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://everlovehomecarellc.com/sitemap-index.xml

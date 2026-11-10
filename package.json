@@ -1,0 +1,23 @@
+{
+  "name": "everlove-homecare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Website for EverLove Homecare LLC — everlovehomecarellc.com",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^8.2.12",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.9"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^6.0.3"
+  }
+}

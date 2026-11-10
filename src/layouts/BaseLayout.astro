@@ -1,0 +1,90 @@
+---
+import "@/styles/global.css";
+import IconSprite from "@/components/IconSprite.astro";
+import { site } from "@/lib/site";
+import { getCollection } from "astro:content";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Hide from search engines (e.g. 404). */
+  noindex?: boolean;
+}
+
+const {
+  title = `${site.name} | Compassionate In-Home Care for Your Loved Ones`,
+  description = `${site.name} provides compassionate, personalized in-home care: personal care, companionship, meal preparation, medication reminders, light housekeeping and errands. Call ${site.phone.international}.`,
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL("/og-image.jpg", Astro.site);
+const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  additionalType: "https://en.wikipedia.org/wiki/Home_care",
+  name: site.name,
+  legalName: site.legalName,
+  slogan: site.tagline,
+  url: site.url,
+  logo: new URL("/icon-512.png", Astro.site).href,
+  image: ogImage.href,
+  telephone: site.phone.schema,
+  email: site.email,
+  makesOffer: services.map((s) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: s.data.title } })),
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#4f1a74" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Allura&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    />
+
+    <script is:inline>document.documentElement.classList.add("js");</script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <IconSprite />
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+    <script>
+      import "@/scripts/reveal";
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute; left: 16px; top: -60px; z-index: 100; background: var(--plum-900); color: #fff;
+    padding: 10px 16px; border-radius: 10px; text-decoration: none; transition: top 0.2s;
+  }
+  .skip-link:focus { top: 12px; }
+</style>

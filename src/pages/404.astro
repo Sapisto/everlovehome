@@ -1,0 +1,30 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Icon from "@/components/Icon.astro";
+import { site } from "@/lib/site";
+---
+
+<BaseLayout title={`Page not found | ${site.name}`} noindex>
+  <Header />
+  <main id="main" class="section notfound">
+    <div class="container">
+      <p class="script">oh dear…</p>
+      <h1 class="section-title">We couldn't find that page.</h1>
+      <p class="lead">But we're always easy to find. Head back home or give us a call.</p>
+      <div class="actions">
+        <a class="btn btn--primary btn--lg" href="/"><Icon name="home" /> Back to Home</a>
+        <a class="btn btn--ghost btn--lg" href={site.phone.href}><Icon name="phone" /> {site.phone.display}</a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .notfound { text-align: center; }
+  .notfound .script { font-size: 3rem; color: var(--orchid); margin-bottom: 8px; }
+  .notfound .lead { margin-inline: auto; }
+  .actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+</style>

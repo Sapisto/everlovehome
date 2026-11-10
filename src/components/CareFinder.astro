@@ -1,0 +1,178 @@
+---
+import Icon from "./Icon.astro";
+import { frequencies, needs } from "@/lib/careFinder";
+import { site } from "@/lib/site";
+---
+
+<section class="section finder" id="plan">
+  <div class="container finder__grid">
+    <div class="reveal">
+      <h2 class="section-title section-title--light">Build your loved one's <em>care plan</em> in 30&nbsp;seconds</h2>
+      <p class="lead lead--light">
+        Tell us a little about what's going on, and we'll suggest a starting point. Then send it to our care team with one
+        tap. No pressure, no obligation.
+      </p>
+      <a class="finder__call" href={site.phone.href}><Icon name="phone" /> Rather talk? Call {site.phone.display}</a>
+    </div>
+
+    <div class="finder__card reveal" data-finder>
+      <fieldset class="finder__step">
+        <legend><span class="step-num">1</span> What could your loved one use help with?</legend>
+        <div class="chips">
+          {needs.map((n) => (
+            <button type="button" class="chip" data-need={n.id} aria-pressed="false">{n.label}</button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset class="finder__step">
+        <legend><span class="step-num">2</span> How much support feels right?</legend>
+        <div class="segments" role="radiogroup" aria-label="How much support">
+          {frequencies.map((f) => (
+            <button type="button" class="segment" role="radio" aria-checked="false" data-freq={f.value}>{f.label}</button>
+          ))}
+        </div>
+      </fieldset>
+
+      <div class="finder__result" aria-live="polite">
+        <div class="result__empty" data-empty>
+          <Icon name="heart" fill />
+          <p>Choose a few options above and your suggested plan will appear here.</p>
+        </div>
+        <div class="result__plan" data-plan hidden>
+          <p class="result__label">Your suggested starting point</p>
+          <ul class="result__services" data-services></ul>
+          <p class="result__freq" data-freq-out></p>
+          <p class="result__note">Every plan is finalized together during your free consultation, and it can change anytime.</p>
+          <button type="button" class="btn btn--gold btn--block" data-send>
+            Send this plan to our care team <Icon name="arrow" />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { buildPlan, type Frequency, type NeedId } from "@/lib/careFinder";
+  import { CARE_PLAN_EVENT } from "@/lib/events";
+
+  const root = document.querySelector<HTMLElement>("[data-finder]");
+  if (root) {
+    const chips = [...root.querySelectorAll<HTMLButtonElement>("[data-need]")];
+    const segments = [...root.querySelectorAll<HTMLButtonElement>("[data-freq]")];
+    const empty = root.querySelector<HTMLElement>("[data-empty]")!;
+    const planEl = root.querySelector<HTMLElement>("[data-plan]")!;
+    const servicesEl = root.querySelector<HTMLUListElement>("[data-services]")!;
+    const freqOut = root.querySelector<HTMLElement>("[data-freq-out]")!;
+    const send = root.querySelector<HTMLButtonElement>("[data-send]")!;
+
+    const selected = new Set<NeedId>();
+    let frequency: Frequency | null = null;
+
+    const check =
+      '<svg class="ic" aria-hidden="true" style="width:16px;height:16px;stroke-width:3"><use href="#i-check"></use></svg>';
+
+    const render = () => {
+      const plan = buildPlan([...selected], frequency);
+      const hasPlan = plan.services.length > 0 || plan.frequency !== null;
+      empty.hidden = hasPlan;
+      planEl.hidden = !hasPlan;
+      servicesEl.replaceChildren(
+        ...plan.services.map((s) => {
+          const li = document.createElement("li");
+          li.innerHTML = check;
+          li.append(s);
+          return li;
+        }),
+      );
+      freqOut.textContent = plan.frequency ? `Schedule: ${plan.frequency}` : "";
+      send.disabled = plan.services.length === 0;
+      return plan;
+    };
+
+    chips.forEach((chip) =>
+      chip.addEventListener("click", () => {
+        const id = chip.dataset.need as NeedId;
+        const on = !selected.has(id);
+        on ? selected.add(id) : selected.delete(id);
+        chip.setAttribute("aria-pressed", String(on));
+        render();
+      }),
+    );
+
+    segments.forEach((seg) =>
+      seg.addEventListener("click", () => {
+        const value = seg.dataset.freq as Frequency;
+        frequency = frequency === value ? null : value;
+        segments.forEach((s) => s.setAttribute("aria-checked", String(s.dataset.freq === frequency)));
+        render();
+      }),
+    );
+
+    send.addEventListener("click", () => {
+      const plan = render();
+      window.dispatchEvent(new CustomEvent(CARE_PLAN_EVENT, { detail: plan }));
+      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+</script>
+
+<style>
+  .finder {
+    color: #fff; overflow: hidden;
+    background:
+      radial-gradient(800px 500px at 0% 0%, rgb(154 79 200 / 0.35), transparent 60%),
+      radial-gradient(700px 500px at 100% 100%, rgb(200 150 62 / 0.18), transparent 60%),
+      var(--plum-900);
+  }
+  .finder__grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(40px, 6vw, 80px); align-items: center; }
+  .finder__call {
+    display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; color: var(--gold-100); font-weight: 600;
+    text-decoration: none; border-bottom: 1px solid rgb(246 234 211 / 0.4); padding-bottom: 4px;
+  }
+  .finder__call:hover { border-color: var(--gold-100); }
+  .finder__card {
+    background: rgb(255 255 255 / 0.06); border: 1px solid rgb(255 255 255 / 0.14); border-radius: var(--radius-lg);
+    padding: clamp(22px, 3.5vw, 36px); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.5);
+  }
+  .finder__step { border: 0; padding: 0; margin: 0 0 26px; min-width: 0; }
+  .finder__step legend { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.05rem; margin-bottom: 14px; padding: 0; }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0;
+    background: var(--gold); color: var(--plum-950); font-size: 0.85rem; font-weight: 800;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip, .segment {
+    border: 1.5px solid rgb(255 255 255 / 0.22); background: rgb(255 255 255 / 0.04); color: #fff;
+    padding: 10px 16px; border-radius: 999px; font-size: 0.93rem; font-weight: 500;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+  }
+  .chip:hover, .segment:hover { border-color: rgb(255 255 255 / 0.55); transform: translateY(-1px); }
+  .chip[aria-pressed="true"], .segment[aria-checked="true"] { background: #fff; color: var(--plum-900); border-color: #fff; font-weight: 600; }
+  .chip[aria-pressed="true"]::before { content: "✓ "; color: var(--brand); }
+  .segments { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .segment { border-radius: 14px; padding: 12px 10px; text-align: center; }
+
+  .finder__result { border-radius: var(--radius); background: #fff; color: var(--ink); padding: 22px; min-height: 150px; display: grid; }
+  .result__empty { display: grid; place-items: center; text-align: center; gap: 10px; color: var(--muted); font-size: 0.95rem; }
+  .result__empty[hidden], .result__plan[hidden] { display: none; }
+  .result__empty :global(.ic) { width: 30px; height: 30px; color: var(--lilac-300); animation: beat 1.8s ease-in-out infinite; }
+  @keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.12); } }
+  .result__plan { animation: rise 0.5s var(--ease); }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+  .result__label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-600); margin-bottom: 12px; }
+  .result__services { display: flex; flex-wrap: wrap; gap: 8px; }
+  .result__services :global(li) {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--lilac-100); color: var(--plum-800);
+    font-weight: 600; padding: 8px 14px; border-radius: 999px; font-size: 0.92rem;
+  }
+  .result__services :global(.ic) { color: var(--brand); }
+  .result__freq { margin-top: 12px; font-weight: 600; color: var(--plum-900); }
+  .result__freq:empty { display: none; }
+  .result__note { margin: 10px 0 18px; font-size: 0.88rem; color: var(--muted); }
+
+  @media (max-width: 980px) { .finder__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .segments { grid-template-columns: 1fr 1fr; } }
+</style>

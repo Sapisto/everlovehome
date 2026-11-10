@@ -1,0 +1,10 @@
+[
+  { "id": "t1", "order": 1, "placeholder": true, "name": "Angela M.", "relation": "Daughter of a client",
+    "quote": "EverLove has been a blessing for our family. Mom's caregiver is kind, patient and truly treats her like her own." },
+  { "id": "t2", "order": 2, "placeholder": true, "name": "James T.", "relation": "Son of a client",
+    "quote": "Professional, reliable and so compassionate. We finally have peace of mind knowing Dad is in great hands." },
+  { "id": "t3", "order": 3, "placeholder": true, "name": "Patricia R.", "relation": "Granddaughter of a client",
+    "quote": "The personalized attention is unmatched. They noticed the little things that make my grandmother smile." },
+  { "id": "t4", "order": 4, "placeholder": true, "name": "Michael O.", "relation": "Son of a client",
+    "quote": "After Dad's hospital stay, EverLove helped him get back on his feet at home. We couldn't have done it alone." }
+]

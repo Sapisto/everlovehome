@@ -1,0 +1,9 @@
+{
+  "name": "EverLove Homecare",
+  "short_name": "EverLove",
+  "icons": [{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }],
+  "theme_color": "#4f1a74",
+  "background_color": "#fdfaf6",
+  "display": "standalone",
+  "start_url": "/"
+}

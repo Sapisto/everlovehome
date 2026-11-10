@@ -1,0 +1,14 @@
+[
+  { "id": "what-care", "order": 1, "question": "What kind of care does EverLove provide?",
+    "answer": "We provide non-medical, in-home care: personal care, companionship, meal preparation, medication reminders, light housekeeping, and errands & transportation. We're happy to coordinate with your loved one's doctors and other care providers." },
+  { "id": "how-quickly", "order": 2, "question": "How quickly can care begin?",
+    "answer": "Often within days of your consultation, depending on your needs and schedule. If you need care urgently, tell us when you call and we'll do everything we can to move quickly." },
+  { "id": "how-often", "order": 3, "question": "Can we choose how often the caregiver visits?",
+    "answer": "Absolutely. Care can be a few hours a week, daily visits, overnights or around-the-clock, and it can change as your loved one's needs change." },
+  { "id": "caregivers", "order": 4, "question": "How do you choose and match caregivers?",
+    "answer": "Every caregiver is carefully screened and background-checked. We match caregivers based on your loved one's needs, personality, interests and schedule, because the right connection matters." },
+  { "id": "informed", "order": 5, "question": "Will our family be kept informed?",
+    "answer": "Yes. We keep families informed and involved with regular updates, and you can reach our team whenever you have questions or concerns." },
+  { "id": "payment", "order": 6, "question": "How is home care paid for?",
+    "answer": "Many families pay privately, and some long-term care insurance policies cover in-home care. We'll walk you through your options during your free consultation." }
+]

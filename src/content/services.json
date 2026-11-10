@@ -1,0 +1,16 @@
+[
+  { "id": "personal-care", "order": 1, "icon": "bath", "title": "Personal Care",
+    "summary": "Gentle, dignified help with bathing, dressing, grooming, toileting and mobility." },
+  { "id": "companion-care", "order": 2, "icon": "users", "title": "Companion Care",
+    "summary": "Warm conversation, games, walks and hobbies: friendship that brightens every day." },
+  { "id": "meal-preparation", "order": 3, "icon": "soup", "title": "Meal Preparation",
+    "summary": "Nutritious, home-cooked meals made to their tastes and dietary needs, plus help with feeding." },
+  { "id": "medication-reminders", "order": 4, "icon": "pill", "title": "Medication Reminders",
+    "summary": "Friendly, on-time reminders that help keep medication schedules on track." },
+  { "id": "light-housekeeping", "order": 5, "icon": "home", "title": "Light Housekeeping",
+    "summary": "Laundry, tidying, dishes and fresh linens, keeping home clean, safe and comfortable." },
+  { "id": "errands-transportation", "order": 6, "icon": "car", "title": "Errands & Transportation",
+    "summary": "Rides to appointments, grocery runs and outings, so life keeps moving." },
+  { "id": "respite-care", "order": 7, "icon": "sun", "title": "Respite Care", "inGrid": false,
+    "summary": "Short-term relief so family caregivers can rest and recharge." }
+]
