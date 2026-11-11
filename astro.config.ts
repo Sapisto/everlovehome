@@ -2,9 +2,14 @@ import { defineConfig, envField } from "astro/config";
 import netlify from "@astrojs/netlify";
 import sitemap from "@astrojs/sitemap";
 
+// The site's public URL, used for canonical links, social previews and the sitemap.
+// On Netlify, `URL` is the site's main address: the *.netlify.app one until the custom
+// domain is added, then the domain. Override with SITE_URL if ever needed.
+const siteUrl = process.env.SITE_URL || process.env.URL || "https://everlovehomecarellc.com";
+
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
-  site: "https://everlovehomecarellc.com",
+  site: siteUrl,
   // Pages are prerendered to static HTML; only routes with `prerender = false`
   // (the contact form API) run as Netlify Functions.
   output: "static",
@@ -25,7 +30,9 @@ export default defineConfig({
       CONTACT_FROM_EMAIL: envField.string({
         context: "server",
         access: "secret",
-        default: "EverLove Website <onboarding@resend.dev>",
+        // Only the address is used: the display name is set per email
+        // ("EverLove Website" for the team, "EverLove Homecare" for customers).
+        default: "EverLove Homecare <onboarding@resend.dev>",
       }),
     },
   },

@@ -1,6 +1,9 @@
 import type { APIRoute } from "astro";
+import { getCollection } from "astro:content";
 import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, RESEND_API_KEY } from "astro:env/server";
-import { contactSchema, type ContactInput, type ContactResponse } from "@/lib/contact";
+import { contactSchema, type ContactResponse } from "@/lib/contact";
+import { confirmationEmail, notificationEmail, type Email } from "@/lib/emails";
+import { site } from "@/lib/site";
 
 // Runs as a Netlify Function; everything else on the site is static.
 export const prerender = false;
@@ -8,34 +11,24 @@ export const prerender = false;
 const json = (body: ContactResponse, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
-const escape = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+/** The bare address from CONTACT_FROM_EMAIL ("Name <addr>" or just "addr"). */
+const fromAddress = CONTACT_FROM_EMAIL.match(/<([^>]+)>/)?.[1] ?? CONTACT_FROM_EMAIL.trim();
 
-function renderEmail(d: ContactInput) {
-  const rows: [string, string][] = [
-    ["Name", d.name],
-    ["Phone", d.phone],
-    ["Email", d.email || "(not provided)"],
-    ["Care is for", d.relationship || "(not specified)"],
-    ["Services", d.services.length ? d.services.join(", ") : "(none selected)"],
-  ];
-  const text = [...rows.map(([k, v]) => `${k}: ${v}`), "", "Message:", d.message || "(no message)"].join("\n");
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:560px;color:#22152e">
-      <h2 style="color:#4f1a74;margin:0 0 16px">New care enquiry from the website</h2>
-      <table style="border-collapse:collapse;width:100%">
-        ${rows
-          .map(
-            ([k, v]) =>
-              `<tr><td style="padding:8px 12px;background:#f4ecfa;font-weight:bold;width:130px">${k}</td><td style="padding:8px 12px;border-bottom:1px solid #ebe1f2">${escape(v)}</td></tr>`,
-          )
-          .join("")}
-      </table>
-      <h3 style="color:#4f1a74;margin:20px 0 8px">Message</h3>
-      <p style="white-space:pre-wrap;background:#faf6fd;padding:12px;border-radius:8px">${escape(d.message || "(no message)")}</p>
-      <p style="margin-top:20px"><a href="tel:${escape(d.phone.replace(/[^0-9+]/g, ""))}" style="background:#6b1f93;color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none">Call ${escape(d.name)}</a></p>
-    </div>`;
-  return { text, html };
+async function send(email: Email & { from: string; to: string; replyTo?: string }) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: email.from,
+      to: [email.to],
+      reply_to: email.replyTo,
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
+    }),
+  });
+  if (!res.ok) console.error("[contact] Resend error", res.status, email.to, await res.text());
+  return res.ok;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -60,23 +53,31 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ ok: false, error: "Our form is temporarily unavailable." }, 503);
   }
 
-  const { text, html } = renderEmail(data);
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: CONTACT_FROM_EMAIL,
-      to: [CONTACT_TO_EMAIL],
-      reply_to: data.email || undefined,
-      subject: `New care enquiry: ${data.name}${data.services.length ? ` (${data.services.join(", ")})` : ""}`,
-      text,
-      html,
-    }),
-  });
+  // Images in emails need a public URL: use the deployed host (production or a
+  // Netlify preview), but fall back to the live domain when running locally.
+  const origin = new URL(request.url).origin;
+  const assetBase = /localhost|127\.0\.0\.1/.test(origin) ? site.url : origin;
 
-  if (!res.ok) {
-    console.error("[contact] Resend error", res.status, await res.text());
-    return json({ ok: false, error: "We couldn't send your message." }, 502);
+  // 1. Tell the EverLove team. This is the one that must succeed.
+  const delivered = await send({
+    ...notificationEmail(data, { assetBase }),
+    from: `EverLove Website <${fromAddress}>`,
+    to: CONTACT_TO_EMAIL,
+    replyTo: data.email || undefined,
+  });
+  if (!delivered) return json({ ok: false, error: "We couldn't send your message." }, 502);
+
+  // 2. Thank the person who booked. A failure here is logged but not shown to
+  //    them: their request already reached the team.
+  if (data.email) {
+    const knownServices = (await getCollection("services")).map((s) => s.data.title);
+    await send({
+      ...confirmationEmail(data, { assetBase, knownServices }),
+      from: `EverLove Homecare <${fromAddress}>`,
+      to: data.email,
+      replyTo: CONTACT_TO_EMAIL,
+    });
   }
+
   return json({ ok: true });
 };

@@ -68,9 +68,14 @@ Check Netlify's DNS screen for the current values; it shows exactly what to ente
 
 ### Email with Resend
 
+Each form submission sends two emails (templates in `src/lib/emails.ts`):
+
+1. **To the team** (`CONTACT_TO_EMAIL`): every detail of the request, with "Call" and "Reply by email" buttons. Replying goes straight to the customer.
+2. **To the customer**, if they gave an email: a branded "we've received your request" confirmation explaining what happens next. Replying goes to `CONTACT_TO_EMAIL`. The team email is sent first; if only the confirmation fails, the error is logged and the customer still sees the success message.
+
 - The free tier covers 3,000 emails a month, which is plenty for a contact form.
-- Until the domain is verified, keep `CONTACT_FROM_EMAIL="EverLove Website <onboarding@resend.dev>"`. While it's unverified, Resend only delivers to the email address of the Resend account owner, so create the Resend account with **everlovehomecarellc@gmail.com**.
-- To verify the domain, open Resend → **Domains → Add**, then add the DNS records it lists in WhoGoHost. After that, set `CONTACT_FROM_EMAIL="EverLove Website <website@everlovehomecarellc.com>"`.
+- **The domain must be verified before launch.** Until it is, the sender is `onboarding@resend.dev`, and Resend only delivers to the Resend account owner's own inbox. Emails to the client's Gmail and confirmations to customers are rejected.
+- To verify the domain, open Resend → **Domains → Add**, then add the DNS records it lists (SPF, DKIM, MX) in WhoGoHost. Once Resend shows it as verified, set `CONTACT_FROM_EMAIL="EverLove Homecare <hello@everlovehomecarellc.com>"` in Netlify and redeploy. Only the address part is used; the display name is set for each email.
 
 ## Pre-launch checklist
 

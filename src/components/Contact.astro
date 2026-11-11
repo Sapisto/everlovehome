@@ -48,7 +48,8 @@ const relationships = ["Mother", "Father", "Spouse / Partner", "Grandparent", "M
         <div class="form__row">
           <label class="field">
             <span>Email</span>
-            <input type="email" name="email" autocomplete="email" />
+            <input type="email" name="email" autocomplete="email" aria-describedby="email-hint" />
+            <small class="field__hint" id="email-hint">We'll email you a confirmation.</small>
           </label>
           <label class="field">
             <span>Care is for my…</span>
@@ -88,7 +89,7 @@ const relationships = ["Mother", "Father", "Spouse / Partner", "Grandparent", "M
       <div class="form__success" data-success hidden tabindex="-1">
         <span class="form__success-icon"><Icon name="heart" fill /></span>
         <h3 class="form__title">Thank you. We've received your request.</h3>
-        <p>A member of our care team will reach out shortly. If you need us sooner, please call
+        <p>A member of our care team will reach out shortly. If you left your email, a confirmation is on its way. If you need us sooner, please call
           <a href={site.phone.href}>{site.phone.display}</a>.</p>
       </div>
     </form>
@@ -211,6 +212,7 @@ const relationships = ["Mother", "Father", "Spouse / Partner", "Grandparent", "M
   .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .field { display: grid; gap: 8px; margin: 0 0 18px; font-size: 0.92rem; font-weight: 600; color: var(--plum-900); min-width: 0; }
   .field i { color: var(--gold-600); font-style: normal; }
+  .field__hint { margin-top: -2px; font-size: 0.8rem; font-weight: 400; color: var(--muted); }
   .field input, .field select, .field textarea {
     width: 100%; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--lilac-50);
     font-weight: 400; font-size: 1rem; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;

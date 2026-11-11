@@ -14,8 +14,12 @@ interface Props {
 const {
   title = `${site.name} | Compassionate In-Home Care for Your Loved Ones`,
   description = `${site.name} provides compassionate, personalized in-home care: personal care, companionship, meal preparation, medication reminders, light housekeeping and errands. Call ${site.phone.international}.`,
-  noindex = false,
+  noindex: noindexProp = false,
 } = Astro.props;
+
+// Keep test deploys (e.g. *.netlify.app) out of search results; only the real domain is indexed.
+const isLiveDomain = Astro.site?.hostname.replace(/^www\./, "") === site.domain;
+const noindex = noindexProp || !isLiveDomain;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL("/og-image.jpg", Astro.site);
