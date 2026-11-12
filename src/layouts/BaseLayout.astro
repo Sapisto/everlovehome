@@ -17,9 +17,15 @@ const {
   noindex: noindexProp = false,
 } = Astro.props;
 
-// Keep test deploys (e.g. *.netlify.app) out of search results; only the real domain is indexed.
+// Keep test deploys out of search results; only production on the real domain is indexed.
+// Netlify sets CONTEXT on every build: "production" for the production branch (main),
+// "branch-deploy" / "deploy-preview" for previews such as test--<project>.netlify.app.
+// Previews must be hidden even after the custom domain exists, because Netlify's `URL`
+// (and therefore Astro.site) is then the real domain on every build.
 const isLiveDomain = Astro.site?.hostname.replace(/^www\./, "") === site.domain;
-const noindex = noindexProp || !isLiveDomain;
+const netlifyContext = process.env.CONTEXT;
+const isPreviewBuild = netlifyContext !== undefined && netlifyContext !== "production";
+const noindex = noindexProp || !isLiveDomain || isPreviewBuild;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL("/og-image.jpg", Astro.site);
