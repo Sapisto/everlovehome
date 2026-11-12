@@ -8,7 +8,7 @@ import { nav, site } from "@/lib/site";
 
 <div class="topbar">
   <div class="container topbar__inner">
-    <p class="topbar__note"><span class="pulse" aria-hidden="true"></span> Now welcoming new clients &amp; families</p>
+    <p class="topbar__note"><span class="pulse" aria-hidden="true"></span> Serving families across {site.region}, {site.state.name}</p>
     <div class="topbar__links">
       <a href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
       <a href={site.phone.href}><Icon name="phone" /> {site.phone.international}</a>

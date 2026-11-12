@@ -32,7 +32,8 @@ src/
   components/          One component per page section, each with its own scoped CSS
   content/*.json       Services, FAQs, testimonials (schemas in src/content.config.ts)
   layouts/             BaseLayout: <head>, SEO, structured data, fonts
-  lib/site.ts          Phone, email, domain, tagline: the single source of truth
+  lib/site.ts          Phone, email, domain, tagline, service areas: the single source of truth
+  lib/story.ts         About, Vision, Mission, Core Values, Promise (the client's own words)
   lib/careFinder.ts    Rules for the care-plan builder
   pages/               index, privacy, 404, api/contact
 public/                favicon, social-share image, robots.txt, manifest
@@ -41,6 +42,9 @@ public/                favicon, social-share image, robots.txt, manifest
 ## Editing content
 
 - **Phone, email or tagline:** edit `src/lib/site.ts`. The change applies everywhere on the site.
+- **About, Vision, Mission, Core Values and Promise:** edit `src/lib/story.ts`.
+- **Service areas (counties):** edit `serviceAreas` in `src/lib/site.ts`. They appear in the Services section, contact details, footer and search-engine data.
+- **Testimonials:** entries marked `"placeholder": true` are never shown. The section appears automatically once a real, permission-granted review is added without that flag.
 - **Services, FAQs, testimonials:** edit the JSON files in `src/content/`. The build fails with a clear error if an entry breaks its schema.
 - **Photos:** add `hero.jpg`, `about.jpg` and/or `careers.jpg` to `src/assets/photos/`. Each one is detected automatically, resized and served as WebP. Until a photo is added, that spot shows a branded placeholder.
   - `hero`: portrait, about 4:5 (shown in an arch-shaped frame)
@@ -79,10 +83,9 @@ Each form submission sends two emails (templates in `src/lib/emails.ts`):
 
 ## Pre-launch checklist
 
-- [ ] Replace the placeholder testimonials in `src/content/testimonials.json` with real reviews the clients have agreed to publish, then remove `"placeholder": true`. Until then the build prints a warning.
+- [ ] Replace the placeholder testimonials in `src/content/testimonials.json` with real reviews the clients have agreed to publish, then remove `"placeholder": true`. Until then the Testimonials section stays hidden.
 - [ ] Get real photos of the client's team (with consent).
 - [ ] Confirm the wording of these claims with the client: "24/7 care", "free consultation", "background-checked", "non-medical care", and the FAQ answers about payment and timing.
-- [ ] Add the service area or city, which helps local SEO.
 - [ ] Have the privacy policy reviewed.
 - [ ] Add social media URLs in `src/lib/site.ts`.
 - [ ] Set up a Google Business Profile and link it to the site.

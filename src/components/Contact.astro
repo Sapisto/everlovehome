@@ -23,6 +23,10 @@ const relationships = ["Mother", "Father", "Spouse / Partner", "Grandparent", "M
           <span class="contact-card__icon"><Icon name="mail" /></span>
           <span><small>Email us</small><strong>{site.email}</strong></span>
         </a>
+        <a class="contact-card" href="#areas">
+          <span class="contact-card__icon"><Icon name="home" /></span>
+          <span><small>Serving {site.region}</small><strong>{site.serviceAreas.length} {site.state.name} counties</strong></span>
+        </a>
         <div class="contact-card">
           <span class="contact-card__icon"><Icon name="clock" /></span>
           <span><small>We're here for you</small><strong>{site.availability}</strong></span>

@@ -17,6 +17,10 @@ export const site = {
   },
   // TODO(client): confirm before launch.
   availability: "24/7 Care. Always Here.",
+  /** Counties served, in the order the client listed them. */
+  serviceAreas: ["Gwinnett", "DeKalb", "Fulton", "Cobb", "Fayette", "Rockdale", "Newton", "Henry", "Clayton"],
+  region: "Metro Atlanta",
+  state: { name: "Georgia", code: "GA" },
   social: {
     // Add real profile URLs when available; empty entries are hidden.
     facebook: "",
@@ -27,9 +31,9 @@ export const site = {
 
 export const nav = [
   { href: "/#about", label: "About" },
+  { href: "/#values", label: "Our Values" },
   { href: "/#services", label: "Services" },
-  { href: "/#plan", label: "Find Care" },
-  { href: "/#process", label: "How It Works" },
+  { href: "/#areas", label: "Service Areas" },
   { href: "/#careers", label: "Careers" },
   { href: "/#faq", label: "FAQ" },
 ] as const;

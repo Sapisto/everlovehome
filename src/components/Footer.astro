@@ -46,6 +46,7 @@ const socials = (
       <a href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
       <a href={site.url}><Icon name="globe" /> {site.domain}</a>
       <p class="footer__always">{site.availability}</p>
+      <p class="footer__areas">Serving {site.serviceAreas.join(", ")} counties, {site.state.name}.</p>
     </div>
   </div>
   <div class="container footer__bottom">
@@ -71,6 +72,7 @@ const socials = (
   .footer__col a { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-size: 0.95rem; transition: color 0.2s; overflow-wrap: anywhere; }
   .footer__col a:hover { color: #fff; }
   .footer__col :global(.ic) { color: var(--gold); }
+  .footer__areas { font-size: 0.88rem; line-height: 1.55; margin-top: 4px; }
   .footer__always { color: var(--gold); font-weight: 700; margin-top: 6px; }
   .footer__bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 24px; border-top: 1px solid rgb(255 255 255 / 0.1); font-size: 0.86rem; }
   .footer__bottom a { text-decoration: none; }

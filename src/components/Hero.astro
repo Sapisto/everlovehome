@@ -27,24 +27,6 @@ import { site } from "@/lib/site";
 
     <div class="hero__visual reveal">
       <Photo name="hero" variant="arch" priority alt="An EverLove caregiver sharing a warm moment with a client at home" />
-
-      <div class="float-card float-card--note" aria-hidden="true">
-        <div class="note__head">
-          <span class="note__avatar"><Icon name="heart" fill /></span>
-          <div><strong>Today with Mom</strong><span>Care update for family</span></div>
-        </div>
-        <ul class="note__list">
-          <li class="done"><Icon name="check" /><span><b>9:00</b> Breakfast together</span></li>
-          <li class="done"><Icon name="check" /><span><b>11:30</b> Walk in the garden</span></li>
-          <li class="next"><span class="dot"></span><span><b>2:00</b> Medication reminder</span></li>
-        </ul>
-        <p class="note__msg">"She told me all about her roses today 💜"</p>
-      </div>
-
-      <div class="float-card float-card--chip" aria-hidden="true">
-        <span class="chip-icon"><Icon name="sparkle" fill /></span>
-        <div><strong>Care plan</strong><span>made just for them</span></div>
-      </div>
     </div>
   </div>
 </section>
@@ -84,35 +66,6 @@ import { site } from "@/lib/site";
 
   .hero__visual { position: relative; max-width: 520px; justify-self: end; width: 100%; }
 
-  .float-card {
-    position: absolute; z-index: 3; background: rgb(255 255 255 / 0.94);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgb(255 255 255 / 0.8); border-radius: var(--radius); box-shadow: var(--shadow);
-  }
-  .float-card--note { left: -56px; bottom: 9%; width: min(300px, 80%); padding: 18px 18px 16px; animation: float 6s ease-in-out infinite; }
-  .float-card--chip { right: -22px; top: 13%; display: flex; align-items: center; gap: 12px; padding: 12px 18px 12px 12px; animation: float 7s 1s ease-in-out infinite reverse; }
-  .float-card--chip strong { display: block; font-size: 0.95rem; color: var(--plum-900); }
-  .float-card--chip div span { font-size: 0.8rem; color: var(--muted); }
-  .chip-icon :global(.ic) { width: 20px; height: 20px; }
-  .chip-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: var(--gold-100); color: var(--gold-600); }
-  @keyframes float { 50% { transform: translateY(-10px); } }
-
-  .note__head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--line); }
-  .note__head strong { display: block; font-size: 0.98rem; color: var(--plum-900); }
-  .note__head div span { font-size: 0.78rem; color: var(--muted); }
-  .note__avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--orchid), var(--plum-700)); color: #fff; }
-  .note__avatar :global(.ic) { width: 18px; height: 18px; }
-  .note__list { display: grid; gap: 8px; padding-block: 12px; font-size: 0.86rem; }
-  .note__list li { display: flex; align-items: center; gap: 10px; }
-  .note__list b { color: var(--plum-800); font-weight: 700; margin-right: 4px; }
-  .note__list .done :global(.ic) { width: 18px; height: 18px; padding: 3px; border-radius: 50%; background: #e3f6ec; color: var(--success); stroke-width: 3; }
-  .note__list .next { color: var(--muted); }
-  .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gold); position: relative; flex-shrink: 0; }
-  .dot::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--gold); animation: blink 1.6s infinite; }
-  @keyframes blink { 50% { opacity: 0.25; } }
-  .note__msg { font-size: 0.85rem; font-style: italic; color: var(--plum-700); background: var(--lilac-100); padding: 10px 12px; border-radius: 12px; }
-
-  @media (max-width: 1100px) { .float-card--note { left: -24px; } }
   @media (max-width: 980px) {
     .hero__grid { grid-template-columns: 1fr; }
     .hero__visual { justify-self: center; max-width: 440px; margin-top: 12px; }
@@ -120,7 +73,5 @@ import { site } from "@/lib/site";
   @media (max-width: 640px) {
     .hero__actions .btn { width: 100%; }
     .hero__trust { flex-direction: column; gap: 10px; }
-    .float-card--note { left: -6px; bottom: 4%; width: 78%; padding: 14px; }
-    .float-card--chip { right: -6px; top: 8%; }
   }
 </style>

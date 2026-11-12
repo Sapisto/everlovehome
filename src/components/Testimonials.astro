@@ -2,15 +2,10 @@
 import { getCollection } from "astro:content";
 import Icon from "./Icon.astro";
 
-const testimonials = (await getCollection("testimonials")).sort((a, b) => a.data.order - b.data.order);
-
-const placeholders = testimonials.filter((t) => t.data.placeholder).length;
-if (placeholders > 0) {
-  console.warn(
-    `\n⚠️  ${placeholders} placeholder testimonial(s) in src/content/testimonials.json. ` +
-      `Replace with real, permission-granted reviews before launch.\n`,
-  );
-}
+// Placeholder (sample) reviews are never shown. The section appears once real,
+// permission-granted reviews are added without `"placeholder": true`.
+const all = (await getCollection("testimonials")).sort((a, b) => a.data.order - b.data.order);
+const testimonials = all.filter((t) => !t.data.placeholder);
 ---
 
 {

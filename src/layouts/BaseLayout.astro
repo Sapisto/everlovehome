@@ -37,6 +37,10 @@ const jsonLd = {
   image: ogImage.href,
   telephone: site.phone.schema,
   email: site.email,
+  areaServed: site.serviceAreas.map((county) => ({
+    "@type": "AdministrativeArea",
+    name: `${county} County, ${site.state.code}`,
+  })),
   makesOffer: services.map((s) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: s.data.title } })),
 };
 ---
