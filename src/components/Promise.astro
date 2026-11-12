@@ -1,13 +1,10 @@
 ---
-import { Image } from "astro:assets";
 import Icon from "./Icon.astro";
-import markWhite from "@/assets/brand/logo-mark-white.png";
 import { promise } from "@/lib/story";
 import { site } from "@/lib/site";
 ---
 
 <section class="promise" id="promise">
-  <Image class="promise__mark" src={markWhite} alt="" aria-hidden="true" width={420} />
   <div class="container promise__inner reveal">
     <div class="promise__copy">
       <p class="script promise__script">our promise</p>
@@ -30,10 +27,6 @@ import { site } from "@/lib/site";
   .promise {
     position: relative; overflow: hidden; color: #fff; padding-block: clamp(64px, 9vw, 112px);
     background: linear-gradient(120deg, var(--plum-900), var(--plum-700) 60%, var(--brand));
-  }
-  .promise :global(.promise__mark) {
-    position: absolute; left: -60px; top: 50%; width: 420px; transform: translateY(-50%) rotate(-8deg);
-    opacity: 0.08; pointer-events: none;
   }
   .promise__inner { position: relative; display: flex; align-items: center; justify-content: space-between; gap: clamp(40px, 6vw, 80px); }
   .promise__copy { max-width: 640px; }

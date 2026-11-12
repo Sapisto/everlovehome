@@ -5,7 +5,6 @@ import { site } from "@/lib/site";
 ---
 
 <section class="hero">
-  <svg class="hero__heart-bg" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"></use></svg>
   <div class="container hero__grid">
     <div class="hero__copy">
       <p class="script hero__script reveal">{site.tagline}</p>
@@ -39,10 +38,6 @@ import { site } from "@/lib/site";
       radial-gradient(900px 600px at 85% 10%, rgb(154 79 200 / 0.16), transparent 60%),
       radial-gradient(700px 500px at 0% 100%, rgb(200 150 62 / 0.1), transparent 60%),
       var(--cream);
-  }
-  .hero__heart-bg {
-    position: absolute; width: 900px; height: 900px; right: -260px; top: -120px; pointer-events: none;
-    fill: none; stroke: rgb(107 31 147 / 0.07); stroke-width: 0.35;
   }
   .hero__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(40px, 6vw, 80px); align-items: center; position: relative; }
   .hero__script { font-size: clamp(2rem, 1.6rem + 1.6vw, 2.9rem); margin-bottom: 8px; color: var(--orchid); }

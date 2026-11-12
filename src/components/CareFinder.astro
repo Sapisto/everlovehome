@@ -36,7 +36,7 @@ import { site } from "@/lib/site";
 
       <div class="finder__result" aria-live="polite">
         <div class="result__empty" data-empty>
-          <Icon name="heart" fill />
+          <Icon name="clipboard" />
           <p>Choose a few options above and your suggested plan will appear here.</p>
         </div>
         <div class="result__plan" data-plan hidden>
@@ -158,8 +158,7 @@ import { site } from "@/lib/site";
   .finder__result { border-radius: var(--radius); background: #fff; color: var(--ink); padding: 22px; min-height: 150px; display: grid; }
   .result__empty { display: grid; place-items: center; text-align: center; gap: 10px; color: var(--muted); font-size: 0.95rem; }
   .result__empty[hidden], .result__plan[hidden] { display: none; }
-  .result__empty :global(.ic) { width: 30px; height: 30px; color: var(--lilac-300); animation: beat 1.8s ease-in-out infinite; }
-  @keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.12); } }
+  .result__empty :global(.ic) { width: 30px; height: 30px; color: var(--lilac-300); }
   .result__plan { animation: rise 0.5s var(--ease); }
   @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
   .result__label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-600); margin-bottom: 12px; }
