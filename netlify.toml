@@ -19,6 +19,16 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
+# --- SITE PAUSED -------------------------------------------------------------
+# Every address returns a plain "404 Not Found" page (public/paused.html) with no
+# site content. To bring the site back: delete this block, then push to `test` and `main`.
+[[redirects]]
+  from = "/*"
+  to = "/paused.html"
+  status = 404
+  force = true
+# ---------------------------------------------------------------------------
+
 # Send www to the apex domain
 [[redirects]]
   from = "https://www.everlovehomecarellc.com/*"
